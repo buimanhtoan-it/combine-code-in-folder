@@ -1,0 +1,67 @@
+{
+  "name": "combine-code-in-folder",
+  "displayName": "Combine Code in Folder",
+  "version": "1.1.0",
+  "description": "Combine Code in Folder is a Visual Studio Code extension that allows you to easily combine code files within a specified folder. It provides a convenient way to merge multiple code files into a single file, making it easier to share or analyze the combined code.",
+  "main": "dist/extension.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "compile": "tsc -p .",
+    "vscode:prepublish": "npm run compile"
+  },
+  "author": {
+    "name": "ToanBui",
+    "email": "buimanhtoan.it@gmail.com"
+  },
+  "publisher": "ToanBui",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/buimanhtoan-it/combine-code-in-folder.git"
+  },
+  "homepage": "https://github.com/buimanhtoan-it/combine-code-in-folder",
+  "bugs": {
+    "url": "https://github.com/buimanhtoan-it/combine-code-in-folder/issues"
+  },
+  "keywords": [
+    "copy",
+    "code",
+    "combine",
+    "files",
+    "folder"
+  ],
+  "engines": {
+    "vscode": "^1.4.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Other",
+    "Formatters",
+    "Debuggers"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "extension.combineCode",
+        "title": "Combine Code",
+        "category": "Other"
+      }
+    ],
+    "menus": {
+      "explorer/context": [
+        {
+          "command": "extension.combineCode",
+          "group": "navigation"
+        }
+      ]
+    }
+  },
+  "dependencies": {
+    "fs": "^0.0.1-security",
+    "path": "^0.12.7",
+    "vscode": "^1.1.37"
+  },
+  "devDependencies": {
+    "typescript": "^5.1.3"
+  }
+}
