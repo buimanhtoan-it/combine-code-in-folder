@@ -36,22 +36,33 @@ function activate(context) {
             vscode.window.showErrorMessage('Please select a folder to combine code.');
         }
     });
-    context.subscriptions.push(combineCodeDisposable);
+    let combineCodeWithFilenamesDisposable = vscode.commands.registerCommand('extension.combineCodeWithFilenames', (uri) => {
+        if (uri && uri.fsPath) {
+            combineCode(uri.fsPath, true);
+        }
+        else {
+            vscode.window.showErrorMessage('Please select a folder to combine code with filenames.');
+        }
+    });
+    context.subscriptions.push(combineCodeDisposable, combineCodeWithFilenamesDisposable);
 }
 exports.activate = activate;
-function combineCode(folderPath) {
+function combineCode(folderPath, includeFilenames = false) {
     const files = fs.readdirSync(folderPath);
     let combinedCode = '';
+    let filenames = '';
     files.forEach((file) => {
         const filePath = path.join(folderPath, file);
         if (fs.statSync(filePath).isFile()) {
+            const fileName = includeFilenames ? `// ${path.basename(filePath)}\n` : '';
             const fileContent = fs.readFileSync(filePath, 'utf8');
-            combinedCode += fileContent + '\n\n';
+            combinedCode += `${fileName}${fileContent}\n\n`;
+            filenames += `${file}\n`;
         }
     });
     vscode.env.clipboard.writeText(combinedCode)
         .then(() => {
-        vscode.window.showInformationMessage('Code files combined successfully and copied to the clipboard!');
+        vscode.window.showInformationMessage('Combined code has been copied to the clipboard.', 'Paste');
     }, (error) => {
         vscode.window.showErrorMessage('Failed to copy the combined code to the clipboard: ' + error);
     });
