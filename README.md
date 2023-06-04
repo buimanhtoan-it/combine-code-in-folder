@@ -22,7 +22,7 @@ To combine code using this extension, follow these steps:
 Suppose you have the following folder structure with code files:
 
 ```
-- Folder
+- RootFolder
   |- Subfolder1
   |  |- file1.js
   |  |- Subfolder2
@@ -52,7 +52,7 @@ function subtract(a, b) {
 
 ### Combine Code to Clipboard
 
-When you select the **Combine Code to Clipboard** option on the `Folder` level, the resulting combined code in the clipboard would be:
+When you select the **Combine Code to Clipboard** option on the `RootFolder` level, the resulting combined code in the clipboard would be:
 
 ```javascript
 console.log('Hello, world!');
@@ -68,24 +68,24 @@ function subtract(a, b) {
 
 ### Combine Code with Filenames
 
-When you select the **Combine Code with Filenames** option on the `Folder` level, the resulting combined code in the clipboard would be:
+When you select the **Combine Code with Filenames** option on the `RootFolder` level, the resulting combined code in the clipboard would be:
 
 ```javascript
-// Subfolder1/file1.js
+// RootFolder/Subfolder1/file1.js
 console.log('Hello, world!');
 
-// Subfolder3/file2.js
+// RootFolder/Subfolder3/file2.js
 function add(a, b) {
     return a + b;
 }
 
-// Subfolder1/Subfolder2/file3.js
+// RootFolder/Subfolder1/Subfolder2/file3.js
 function subtract(a, b) {
     return a - b;
 }
 ```
 
-In this example, the code files from nested deeper folders (`Subfolder2` and its contents) are combined as well, and the relative paths with folder names are included in the resulting combined code.
+In this example, the code files from nested deeper folders (`Subfolder2` and its contents) are combined as well, and the relative paths with the root folder's name are included in the resulting combined code.
 
 ## Installation
 
