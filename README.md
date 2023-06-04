@@ -19,7 +19,17 @@ To combine code using this extension, follow these steps:
 
 ## Example
 
-Suppose you have the following two code files in your selected folder:
+Suppose you have the following folder structure with code files:
+
+```
+- Folder
+  |- Subfolder1
+  |  |- file1.js
+  |  |- Subfolder2
+  |     |- file3.js
+  |- Subfolder3
+     |- file2.js
+```
 
 **File 1: `file1.js`**
 ```javascript
@@ -33,31 +43,49 @@ function add(a, b) {
 }
 ```
 
+**File 3: `file3.js`**
+```javascript
+function subtract(a, b) {
+    return a - b;
+}
+```
+
 ### Combine Code to Clipboard
 
-When you select the **Combine Code to Clipboard** option, the resulting combined code in the clipboard would be:
+When you select the **Combine Code to Clipboard** option on the `Folder` level, the resulting combined code in the clipboard would be:
 
 ```javascript
 console.log('Hello, world!');
 
 function add(a, b) {
     return a + b;
+}
+
+function subtract(a, b) {
+    return a - b;
 }
 ```
 
 ### Combine Code with Filenames
 
-When you select the **Combine Code with Filenames** option, the resulting combined code in the clipboard would be:
+When you select the **Combine Code with Filenames** option on the `Folder` level, the resulting combined code in the clipboard would be:
 
 ```javascript
-// file1.js
+// Subfolder1/file1.js
 console.log('Hello, world!');
 
-// file2.js
+// Subfolder3/file2.js
 function add(a, b) {
     return a + b;
 }
+
+// Subfolder1/Subfolder2/file3.js
+function subtract(a, b) {
+    return a - b;
+}
 ```
+
+In this example, the code files from nested deeper folders (`Subfolder2` and its contents) are combined as well, and the relative paths with folder names are included in the resulting combined code.
 
 ## Installation
 

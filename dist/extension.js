@@ -30,34 +30,46 @@ const path = __importStar(require("path"));
 function activate(context) {
     let combineCodeDisposable = vscode.commands.registerCommand('extension.combineCode', (uri) => {
         if (uri && uri.fsPath) {
-            combineCode(uri.fsPath);
+            const isDirectory = fs.statSync(uri.fsPath).isDirectory();
+            if (isDirectory) {
+                combineCodeFolder(uri.fsPath);
+            }
+            else {
+                combineCodeFile(uri.fsPath);
+            }
         }
         else {
-            vscode.window.showErrorMessage('Please select a folder to combine code.');
+            vscode.window.showErrorMessage('Please select a folder or file to combine code.');
         }
     });
     let combineCodeWithFilenamesDisposable = vscode.commands.registerCommand('extension.combineCodeWithFilenames', (uri) => {
         if (uri && uri.fsPath) {
-            combineCode(uri.fsPath, true);
+            const isDirectory = fs.statSync(uri.fsPath).isDirectory();
+            if (isDirectory) {
+                combineCodeFolder(uri.fsPath, true);
+            }
+            else {
+                combineCodeFile(uri.fsPath, true);
+            }
         }
         else {
-            vscode.window.showErrorMessage('Please select a folder to combine code with filenames.');
+            vscode.window.showErrorMessage('Please select a folder or file to combine code with filenames.');
         }
     });
     context.subscriptions.push(combineCodeDisposable, combineCodeWithFilenamesDisposable);
 }
 exports.activate = activate;
-function combineCode(folderPath, includeFilenames = false) {
-    const files = fs.readdirSync(folderPath);
+function combineCodeFolder(folderPath, includeFilenames = false, rootFolderPath = folderPath) {
+    const files = traverseFolder(folderPath);
     let combinedCode = '';
-    let filenames = '';
     files.forEach((file) => {
         const filePath = path.join(folderPath, file);
         if (fs.statSync(filePath).isFile()) {
-            const fileName = includeFilenames ? `// ${path.basename(filePath)}\n` : '';
+            const relativePath = path.relative(rootFolderPath, filePath);
+            const folderName = path.basename(folderPath);
+            const fileName = includeFilenames ? `// ${path.join(folderName, relativePath)}\n` : '';
             const fileContent = fs.readFileSync(filePath, 'utf8');
             combinedCode += `${fileName}${fileContent}\n\n`;
-            filenames += `${file}\n`;
         }
     });
     vscode.env.clipboard.writeText(combinedCode)
@@ -66,6 +78,33 @@ function combineCode(folderPath, includeFilenames = false) {
     }, (error) => {
         vscode.window.showErrorMessage('Failed to copy the combined code to the clipboard: ' + error);
     });
+}
+function combineCodeFile(filePath, includeFilenames = false) {
+    const fileName = path.basename(filePath);
+    const fileContent = fs.readFileSync(filePath, 'utf8');
+    const combinedCode = includeFilenames ? `// ${fileName}\n${fileContent.trim()}` : fileContent.trim();
+    vscode.env.clipboard.writeText(combinedCode)
+        .then(() => {
+        vscode.window.showInformationMessage(`Code from '${fileName}' has been copied to the clipboard.`, 'Paste');
+    }, (error) => {
+        vscode.window.showErrorMessage(`Failed to copy the code from '${fileName}' to the clipboard: ${error}`);
+    });
+}
+function traverseFolder(folderPath) {
+    let result = [];
+    const files = fs.readdirSync(folderPath);
+    files.forEach((file) => {
+        const filePath = path.join(folderPath, file);
+        const stat = fs.statSync(filePath);
+        if (stat.isFile()) {
+            result.push(file);
+        }
+        else if (stat.isDirectory()) {
+            const nestedFiles = traverseFolder(filePath);
+            result = result.concat(nestedFiles.map(nestedFile => path.join(file, nestedFile)));
+        }
+    });
+    return result;
 }
 function deactivate() { }
 exports.deactivate = deactivate;
