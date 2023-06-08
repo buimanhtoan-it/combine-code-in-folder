@@ -28,66 +28,80 @@ const vscode = __importStar(require("vscode"));
 const fs = __importStar(require("fs"));
 const path = __importStar(require("path"));
 function activate(context) {
-    let combineCodeDisposable = vscode.commands.registerCommand('extension.combineCode', (uri) => {
-        if (uri && uri.fsPath) {
-            const isDirectory = fs.statSync(uri.fsPath).isDirectory();
-            if (isDirectory) {
-                combineCodeFolder(uri.fsPath);
+    let combineCodeDisposable = vscode.commands.registerCommand('extension.combineCode', (...args) => {
+        const uris = args.map(arg => arg instanceof vscode.Uri ? arg : arg.fsPath);
+        if (uris.length > 0) {
+            const filePaths = [];
+            uris.forEach(uri => {
+                if (uri instanceof vscode.Uri) {
+                    const isDirectory = fs.statSync(uri.fsPath).isDirectory();
+                    if (isDirectory) {
+                        const files = traverseFolder(uri.fsPath);
+                        filePaths.push(...files);
+                    }
+                    else {
+                        filePaths.push(uri.fsPath);
+                    }
+                }
+            });
+            if (filePaths.length > 0) {
+                combineCodeFiles(filePaths);
             }
             else {
-                combineCodeFile(uri.fsPath);
+                vscode.window.showErrorMessage('No files found in the selected folders.');
             }
         }
         else {
-            vscode.window.showErrorMessage('Please select a folder or file to combine code.');
+            vscode.window.showErrorMessage('Please select one or more files or folders to combine code or open a file in the editor.');
         }
     });
-    let combineCodeWithFilenamesDisposable = vscode.commands.registerCommand('extension.combineCodeWithFilenames', (uri) => {
-        if (uri && uri.fsPath) {
-            const isDirectory = fs.statSync(uri.fsPath).isDirectory();
-            if (isDirectory) {
-                combineCodeFolder(uri.fsPath, true);
+    let combineCodeWithFilenamesDisposable = vscode.commands.registerCommand('extension.combineCodeWithFilenames', (...args) => {
+        const uris = args.map(arg => arg instanceof vscode.Uri ? arg : arg.fsPath);
+        if (uris.length > 0) {
+            const filePaths = [];
+            uris.forEach(uri => {
+                if (uri instanceof vscode.Uri) {
+                    const isDirectory = fs.statSync(uri.fsPath).isDirectory();
+                    if (isDirectory) {
+                        const files = traverseFolder(uri.fsPath);
+                        filePaths.push(...files);
+                    }
+                    else {
+                        filePaths.push(uri.fsPath);
+                    }
+                }
+            });
+            if (filePaths.length > 0) {
+                combineCodeFiles(filePaths, true);
             }
             else {
-                combineCodeFile(uri.fsPath, true);
+                vscode.window.showErrorMessage('No files found in the selected folders.');
             }
         }
         else {
-            vscode.window.showErrorMessage('Please select a folder or file to combine code with filenames.');
+            vscode.window.showErrorMessage('Please select one or more files or folders to combine code with filenames or open a file in the editor.');
         }
     });
     context.subscriptions.push(combineCodeDisposable, combineCodeWithFilenamesDisposable);
 }
 exports.activate = activate;
-function combineCodeFolder(folderPath, includeFilenames = false, rootFolderPath = folderPath) {
-    const files = traverseFolder(folderPath);
+function combineCodeFiles(filePaths, includeFilenames = false) {
     let combinedCode = '';
-    files.forEach((file) => {
-        const filePath = path.join(folderPath, file);
-        if (fs.statSync(filePath).isFile()) {
-            const relativePath = path.relative(rootFolderPath, filePath);
-            const folderName = path.basename(folderPath);
-            const fileName = includeFilenames ? `// ${path.join(folderName, relativePath)}\n` : '';
-            const fileContent = fs.readFileSync(filePath, 'utf8');
-            combinedCode += `${fileName}${fileContent}\n\n`;
-        }
+    filePaths.forEach((filePath) => {
+        const fileName = path.basename(filePath);
+        const fileContent = fs.readFileSync(filePath, 'utf8');
+        const codeSnippet = includeFilenames ? `// ${fileName}\n${fileContent.trim()}` : fileContent.trim();
+        combinedCode += `${codeSnippet}\n\n`;
     });
+    const codePreview = combinedCode.substr(0, 100); // Limit the code preview to 100 characters
     vscode.env.clipboard.writeText(combinedCode)
         .then(() => {
-        vscode.window.showInformationMessage('Combined code has been copied to the clipboard.', 'Paste');
-    }, (error) => {
+        const fileCount = filePaths.length;
+        const message = `Code from ${fileCount} file${fileCount > 1 ? 's' : ''} has been copied to the clipboard.\n\nCode Preview:\n${codePreview}...`;
+        vscode.window.showInformationMessage(message);
+    })
+        .then(undefined, (error) => {
         vscode.window.showErrorMessage('Failed to copy the combined code to the clipboard: ' + error);
-    });
-}
-function combineCodeFile(filePath, includeFilenames = false) {
-    const fileName = path.basename(filePath);
-    const fileContent = fs.readFileSync(filePath, 'utf8');
-    const combinedCode = includeFilenames ? `// ${fileName}\n${fileContent.trim()}` : fileContent.trim();
-    vscode.env.clipboard.writeText(combinedCode)
-        .then(() => {
-        vscode.window.showInformationMessage(`Code from '${fileName}' has been copied to the clipboard.`, 'Paste');
-    }, (error) => {
-        vscode.window.showErrorMessage(`Failed to copy the code from '${fileName}' to the clipboard: ${error}`);
     });
 }
 function traverseFolder(folderPath) {
@@ -97,11 +111,11 @@ function traverseFolder(folderPath) {
         const filePath = path.join(folderPath, file);
         const stat = fs.statSync(filePath);
         if (stat.isFile()) {
-            result.push(file);
+            result.push(filePath);
         }
         else if (stat.isDirectory()) {
             const nestedFiles = traverseFolder(filePath);
-            result = result.concat(nestedFiles.map(nestedFile => path.join(file, nestedFile)));
+            result.push(...nestedFiles);
         }
     });
     return result;

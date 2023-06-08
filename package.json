@@ -1,13 +1,14 @@
 {
   "name": "combine-code-in-folder",
   "displayName": "Combine Code in Folder",
-  "version": "1.2.4",
+  "version": "1.2.5",
   "description": "Combine Code in Folder is a Visual Studio Code extension that allows you to easily combine code files within a specified folder. It provides a convenient way to merge multiple code files into a single file, making it easier to share or analyze the combined code.\n\nThis extension offers two options for combining code:\n\n1. Combine Code to Clipboard: This option combines the code files and copies the resulting combined code to the clipboard.\n\n2. Combine Code with Filenames: This option combines the code files and includes the filenames in the resulting combined code, providing better context for the combined code snippets.",
   "main": "dist/extension.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "compile": "tsc -p .",
-    "vscode:prepublish": "npm run compile"
+    "vscode:prepublish": "npm run compile",
+    "vscode:package": "vsce package"
   },
   "author": {
     "name": "ToanBui",
@@ -66,6 +67,16 @@
           "command": "extension.combineCodeWithFilenames",
           "group": "navigation"
         }
+      ],
+      "explorer/context:multi": [
+        {
+          "command": "extension.combineCode",
+          "group": "navigation"
+        },
+        {
+          "command": "extension.combineCodeWithFilenames",
+          "group": "navigation"
+        }
       ]
     }
   },
@@ -75,7 +86,8 @@
   },
   "devDependencies": {
     "typescript": "^4.4.4",
-    "vscode": "^1.60.0"
+    "vscode": "^1.60.0",
+    "vsce": "^1.101.0"
   },
   "icon": "images/logo.png"
 }
