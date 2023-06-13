@@ -66,9 +66,9 @@ function combineCodeFiles(filePaths: string[], includeFilenames: boolean = false
   let combinedCode = '';
 
   filePaths.forEach((filePath) => {
-    const fileName = path.basename(filePath);
+    const relativePath = getRelativePath(filePath); // Get the relative path
     const fileContent = fs.readFileSync(filePath, 'utf8');
-    const codeSnippet = includeFilenames ? `// ${fileName}\n${fileContent.trim()}` : fileContent.trim();
+    const codeSnippet = includeFilenames ? `// ${relativePath}\n${fileContent.trim()}` : fileContent.trim();
     combinedCode += `${codeSnippet}\n\n`;
   });
 
@@ -83,6 +83,21 @@ function combineCodeFiles(filePaths: string[], includeFilenames: boolean = false
     .then(undefined, (error) => {
       vscode.window.showErrorMessage('Failed to copy the combined code to the clipboard: ' + error);
     });
+}
+
+function getRelativePath(filePath: string): string {
+  const workspaceFolders = vscode.workspace.workspaceFolders;
+  if (workspaceFolders) {
+    for (const folder of workspaceFolders) {
+      const folderPath = folder.uri.fsPath;
+      if (filePath.startsWith(folderPath)) {
+        const relativePath = path.relative(folderPath, filePath).replace(/\\/g, '/'); // Calculate the relative path and replace backslashes with forward slashes
+        return relativePath;
+      }
+    }
+  }
+
+  return filePath;
 }
 
 function traverseFolder(folderPath: string): string[] {

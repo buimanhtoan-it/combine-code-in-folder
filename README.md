@@ -8,20 +8,26 @@ Combine Code in Folder is a Visual Studio Code extension that allows you to easi
 
 - **Combine Code with Filenames**: This option combines the code files and includes the filenames in the resulting combined code, providing better context for the combined code snippets.
 
+- **Compatibility with ChatGPT**: The extension's ability to preserve the folder/project structure when combining code files makes it useful for analyzing code in the context of project organization. When pasting the combined code into ChatGPT, it can understand and analyze the structure of the project or folder.
+
 ## Usage
 
-To combine code using this extension, follow these steps:
+To combine code using this extension and utilize it with ChatGPT, follow these steps:
 
 1. Right-click on a folder in the Visual Studio Code Explorer.
 2. Select the **Combine Code to Clipboard** option to combine the code files and copy the combined code to the clipboard.
 3. Alternatively, you can choose the **Combine Code with Filenames** option to include filenames in the combined code.
-4. Paste the combined code wherever you need it.
+4. Paste the combined code into ChatGPT for analysis, discussions, code reviews, or seeking assistance. ChatGPT will be able to understand and analyze the code within the context of the project's folder structure.
+
+With this extension, you can easily share code snippets with ChatGPT and have meaningful discussions or receive valuable insights based on the project's folder structure.
 
 ## Example
 
 Suppose you have the following folder structure with code files:
 
 ```
+**Project Structure:**
+
 - RootFolder
   |- Subfolder1
   |  |- file1.js
@@ -29,6 +35,7 @@ Suppose you have the following folder structure with code files:
   |     |- file3.js
   |- Subfolder3
      |- file2.js
+
 ```
 
 **File 1: `file1.js`**
@@ -89,7 +96,21 @@ In this example, the code files from nested deeper folders (`Subfolder2` and its
 
 ## Installation
 
-You can install the extension from the Visual Studio Code Marketplace [here](https://marketplace.visualstudio.com/items?itemName=ToanBui.combine-code-in-folder).
+You can install the extension from the Visual Studio Code Marketplace [here](https://marketplace.visualstudio.com/items?itemName=To
+
+anBui.combine-code-in-folder).
+
+## Donate
+
+If you find this extension helpful and would like to support its development, consider donating to the project's Patreon page:
+
+[![Patreon](https://img.shields.io/badge/support-patreon-F96854.svg)](https://patreon.com/ToanBui)
+
+Your contribution will help in maintaining and improving this extension. Thank you for your support!
+
+## Change Log
+
+- **v1.2.6** (June 13, 2023): Fixed an issue with relative path handling when combining code files.
 
 ## Feedback
 
