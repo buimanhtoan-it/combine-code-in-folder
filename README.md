@@ -96,9 +96,7 @@ In this example, the code files from nested deeper folders (`Subfolder2` and its
 
 ## Installation
 
-You can install the extension from the Visual Studio Code Marketplace [here](https://marketplace.visualstudio.com/items?itemName=To
-
-anBui.combine-code-in-folder).
+You can install the extension from the Visual Studio Code Marketplace [here](https://marketplace.visualstudio.com/items?itemName=ToanBui.combine-code-in-folder).
 
 ## Donate
 
