@@ -102,13 +102,13 @@ You can install the extension from the Visual Studio Code Marketplace [here](htt
 
 If you find this extension helpful and would like to support its development, consider donating to the project's Patreon page:
 
-[![Patreon](https://img.shields.io/badge/support-patreon-F96854.svg)](https://patreon.com/ToanBui)
+[![Patreon](https://img.shields.io/badge/support-patreon-F96854.svg)](https://patreon.com/ToanBui) 
 
-Your contribution will help in maintaining and improving this extension. Thank you for your support!
+Just buy me a cup of coffee. Thank you for your support!
 
 ## Change Log
 
-- **v1.2.6** (June 13, 2023): Fixed an issue with relative path handling when combining code files.
+- **v1.2.7** (June 13, 2023): Fixed an issue with relative path handling when combining code files.
 
 ## Feedback
 
