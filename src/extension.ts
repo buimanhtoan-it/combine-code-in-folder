@@ -4,7 +4,7 @@ import * as path from 'path';
 
 export function activate(context: vscode.ExtensionContext) {
   let combineCodeDisposable = vscode.commands.registerCommand('extension.combineCode', (...args: any[]) => {
-    const uris: vscode.Uri[] = args.map(arg => arg instanceof vscode.Uri ? arg : arg.fsPath);
+    const uris: vscode.Uri[] = extractUniqueUris(args);
 
     if (uris.length > 0) {
       const filePaths: string[] = [];
@@ -32,7 +32,7 @@ export function activate(context: vscode.ExtensionContext) {
   });
 
   let combineCodeWithFilenamesDisposable = vscode.commands.registerCommand('extension.combineCodeWithFilenames', (...args: any[]) => {
-    const uris: vscode.Uri[] = args.map(arg => arg instanceof vscode.Uri ? arg : arg.fsPath);
+    const uris: vscode.Uri[] = extractUniqueUris(args);
 
     if (uris.length > 0) {
       const filePaths: string[] = [];
@@ -60,6 +60,45 @@ export function activate(context: vscode.ExtensionContext) {
   });
 
   context.subscriptions.push(combineCodeDisposable, combineCodeWithFilenamesDisposable);
+}
+
+function extractUniqueUris(args: any[]): vscode.Uri[] {
+  const flatArgs = flattenArray(args);
+
+  // Object to keep track of URIs by their paths
+  const uriMap: { [path: string]: vscode.Uri } = {};
+
+  flatArgs.forEach(arg => {
+    if (arg instanceof vscode.Uri) {
+      const path = arg.fsPath;
+      // Add URI to map if it's not already overridden by a parent directory
+      if (!isOverriddenByParent(path, uriMap)) {
+        uriMap[path] = arg;
+      }
+    }
+  });
+
+  // Filter out any URIs that are children of existing URIs
+  const uniqueUris = Object.values(uriMap);
+
+  return uniqueUris;
+}
+
+function flattenArray(arr: any[]): any[] {
+  return arr.reduce((acc: any[], item: any) => {
+    return Array.isArray(item)
+      ? acc.concat(flattenArray(item))
+      : acc.concat(item);
+  }, []);
+}
+
+function isOverriddenByParent(path: string, uriMap: { [path: string]: vscode.Uri }): boolean {
+  for (const existingPath in uriMap) {
+    if (path.startsWith(existingPath) && path !== existingPath) {
+      return true; // Path is a child of an existing path
+    }
+  }
+  return false;
 }
 
 function combineCodeFiles(filePaths: string[], includeFilenames: boolean = false) {

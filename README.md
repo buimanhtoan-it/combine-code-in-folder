@@ -5,19 +5,36 @@ Combine Code in Folder is a Visual Studio Code extension that allows you to easi
 ## Features
 
 - **Combine Code to Clipboard**: This option combines the code files and copies the resulting combined code to the clipboard.
-
+  
 - **Combine Code with Filenames**: This option combines the code files and includes the filenames in the resulting combined code, providing better context for the combined code snippets.
 
+- **Copy All Selected Files**: With version ^1.3.2, you can now right-click on multiple selected files in the Visual Studio Code Explorer and copy their combined code to the clipboard. The extension will handle all selected files, not just the first file you clicked.
+
 - **Compatibility with ChatGPT**: The extension's ability to preserve the folder/project structure when combining code files makes it useful for analyzing code in the context of project organization. When pasting the combined code into ChatGPT, it can understand and analyze the structure of the project or folder.
+
+## Donate
+
+If you find this extension helpful and would like to support its development, consider donating to the project's Patreon page:
+
+[![Patreon](https://img.shields.io/badge/support-patreon-F96854.svg)](https://patreon.com/ToanBui) 
+
+Let me taste the coffee you bought! </☕☕>
+
+## Change Log
+
+- **v1.3.2** (August 21, 2024): Added a new feature to copy all selected files when right-clicked in the Visual Studio Code Explorer.
+
+- **v1.2.7** (June 13, 2023): Fixed an issue with relative path handling when combining code files.
 
 ## Usage
 
 To combine code using this extension and utilize it with ChatGPT, follow these steps:
 
-1. Right-click on a folder in the Visual Studio Code Explorer.
+1. Right-click on a folder or multiple selected files in the Visual Studio Code Explorer.
 2. Select the **Combine Code to Clipboard** option to combine the code files and copy the combined code to the clipboard.
-3. Alternatively, you can choose the **Combine Code with Filenames** option to include filenames in the combined code.
-4. Paste the combined code into ChatGPT for analysis, discussions, code reviews, or seeking assistance. ChatGPT will be able to understand and analyze the code within the context of the project's folder structure.
+3. Alternatively, choose the **Combine Code with Filenames** option to include filenames in the combined code.
+4. For version ^1.3.2, if you have multiple files selected, the extension will combine and copy the code from all selected files.
+5. Paste the combined code into ChatGPT for analysis, discussions, code reviews, or seeking assistance. ChatGPT will be able to understand and analyze the code within the context of the project's folder structure.
 
 With this extension, you can easily share code snippets with ChatGPT and have meaningful discussions or receive valuable insights based on the project's folder structure.
 
@@ -59,7 +76,7 @@ function subtract(a, b) {
 
 ### Combine Code to Clipboard
 
-When you select the **Combine Code to Clipboard** option on the `RootFolder` level, the resulting combined code in the clipboard would be:
+When you select the **Combine Code to Clipboard** option on the `RootFolder` level, or if you have multiple files selected, the resulting combined code in the clipboard would be:
 
 ```javascript
 console.log('Hello, world!');
@@ -75,7 +92,7 @@ function subtract(a, b) {
 
 ### Combine Code with Filenames
 
-When you select the **Combine Code with Filenames** option on the `RootFolder` level, the resulting combined code in the clipboard would be:
+When you select the **Combine Code with Filenames** option on the `RootFolder` level, or if you have multiple files selected, the resulting combined code in the clipboard would be:
 
 ```javascript
 // RootFolder/Subfolder1/file1.js
@@ -97,18 +114,6 @@ In this example, the code files from nested deeper folders (`Subfolder2` and its
 ## Installation
 
 You can install the extension from the Visual Studio Code Marketplace [here](https://marketplace.visualstudio.com/items?itemName=ToanBui.combine-code-in-folder).
-
-## Donate
-
-If you find this extension helpful and would like to support its development, consider donating to the project's Patreon page:
-
-[![Patreon](https://img.shields.io/badge/support-patreon-F96854.svg)](https://patreon.com/ToanBui) 
-
-Just buy me a cup of coffee. Thank you for your support!
-
-## Change Log
-
-- **v1.2.7** (June 13, 2023): Fixed an issue with relative path handling when combining code files.
 
 ## Feedback
 

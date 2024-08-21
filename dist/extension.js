@@ -23,13 +23,14 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deactivate = exports.activate = void 0;
+exports.activate = activate;
+exports.deactivate = deactivate;
 const vscode = __importStar(require("vscode"));
 const fs = __importStar(require("fs"));
 const path = __importStar(require("path"));
 function activate(context) {
     let combineCodeDisposable = vscode.commands.registerCommand('extension.combineCode', (...args) => {
-        const uris = args.map(arg => arg instanceof vscode.Uri ? arg : arg.fsPath);
+        const uris = extractUniqueUris(args);
         if (uris.length > 0) {
             const filePaths = [];
             uris.forEach(uri => {
@@ -56,7 +57,7 @@ function activate(context) {
         }
     });
     let combineCodeWithFilenamesDisposable = vscode.commands.registerCommand('extension.combineCodeWithFilenames', (...args) => {
-        const uris = args.map(arg => arg instanceof vscode.Uri ? arg : arg.fsPath);
+        const uris = extractUniqueUris(args);
         if (uris.length > 0) {
             const filePaths = [];
             uris.forEach(uri => {
@@ -84,7 +85,38 @@ function activate(context) {
     });
     context.subscriptions.push(combineCodeDisposable, combineCodeWithFilenamesDisposable);
 }
-exports.activate = activate;
+function extractUniqueUris(args) {
+    const flatArgs = flattenArray(args);
+    // Object to keep track of URIs by their paths
+    const uriMap = {};
+    flatArgs.forEach(arg => {
+        if (arg instanceof vscode.Uri) {
+            const path = arg.fsPath;
+            // Add URI to map if it's not already overridden by a parent directory
+            if (!isOverriddenByParent(path, uriMap)) {
+                uriMap[path] = arg;
+            }
+        }
+    });
+    // Filter out any URIs that are children of existing URIs
+    const uniqueUris = Object.values(uriMap);
+    return uniqueUris;
+}
+function flattenArray(arr) {
+    return arr.reduce((acc, item) => {
+        return Array.isArray(item)
+            ? acc.concat(flattenArray(item))
+            : acc.concat(item);
+    }, []);
+}
+function isOverriddenByParent(path, uriMap) {
+    for (const existingPath in uriMap) {
+        if (path.startsWith(existingPath) && path !== existingPath) {
+            return true; // Path is a child of an existing path
+        }
+    }
+    return false;
+}
 function combineCodeFiles(filePaths, includeFilenames = false) {
     let combinedCode = '';
     filePaths.forEach((filePath) => {
@@ -134,4 +166,3 @@ function traverseFolder(folderPath) {
     return result;
 }
 function deactivate() { }
-exports.deactivate = deactivate;
