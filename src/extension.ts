@@ -65,23 +65,32 @@ export function activate(context: vscode.ExtensionContext) {
 function extractUniqueUris(args: any[]): vscode.Uri[] {
   const flatArgs = flattenArray(args);
 
-  // Object to keep track of URIs by their paths
-  const uriMap: { [path: string]: vscode.Uri } = {};
+  const orderedUris: vscode.Uri[] = [];
+  const pathSet: Set<string> = new Set();
 
   flatArgs.forEach(arg => {
     if (arg instanceof vscode.Uri) {
       const path = arg.fsPath;
-      // Add URI to map if it's not already overridden by a parent directory
-      if (!isOverriddenByParent(path, uriMap)) {
-        uriMap[path] = arg;
+      if (!pathSet.has(path) && !isOverriddenByParentInSet(path, pathSet)) {
+        const indicesToRemove: number[] = [];
+        orderedUris.forEach((existingUri, index) => {
+          if (existingUri.fsPath.startsWith(path) && existingUri.fsPath !== path) {
+            indicesToRemove.push(index);
+            pathSet.delete(existingUri.fsPath);
+          }
+        });
+        
+        indicesToRemove.reverse().forEach(index => {
+          orderedUris.splice(index, 1);
+        });
+
+        orderedUris.push(arg);
+        pathSet.add(path);
       }
     }
   });
 
-  // Filter out any URIs that are children of existing URIs
-  const uniqueUris = Object.values(uriMap);
-
-  return uniqueUris;
+  return orderedUris;
 }
 
 function flattenArray(arr: any[]): any[] {
@@ -95,7 +104,16 @@ function flattenArray(arr: any[]): any[] {
 function isOverriddenByParent(path: string, uriMap: { [path: string]: vscode.Uri }): boolean {
   for (const existingPath in uriMap) {
     if (path.startsWith(existingPath) && path !== existingPath) {
-      return true; // Path is a child of an existing path
+      return true; 
+    }
+  }
+  return false;
+}
+
+function isOverriddenByParentInSet(path: string, pathSet: Set<string>): boolean {
+  for (const existingPath of pathSet) {
+    if (path.startsWith(existingPath) && path !== existingPath) {
+      return true; 
     }
   }
   return false;
@@ -105,13 +123,13 @@ function combineCodeFiles(filePaths: string[], includeFilenames: boolean = false
   let combinedCode = '';
 
   filePaths.forEach((filePath) => {
-    const relativePath = getRelativePath(filePath); // Get the relative path
+    const relativePath = getRelativePath(filePath); 
     const fileContent = fs.readFileSync(filePath, 'utf8');
     const codeSnippet = includeFilenames ? `// ${relativePath}\n${fileContent.trim()}` : fileContent.trim();
     combinedCode += `${codeSnippet}\n\n`;
   });
 
-  const codePreview = combinedCode.substr(0, 100); // Limit the code preview to 100 characters
+  const codePreview = combinedCode.substr(0, 100); 
 
   vscode.env.clipboard.writeText(combinedCode)
     .then(() => {
@@ -130,7 +148,7 @@ function getRelativePath(filePath: string): string {
     for (const folder of workspaceFolders) {
       const folderPath = folder.uri.fsPath;
       if (filePath.startsWith(folderPath)) {
-        const relativePath = path.relative(folderPath, filePath).replace(/\\/g, '/'); // Calculate the relative path and replace backslashes with forward slashes
+        const relativePath = path.relative(folderPath, filePath).replace(/\\/g, '/'); 
         return relativePath;
       }
     }

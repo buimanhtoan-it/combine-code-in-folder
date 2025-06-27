@@ -2,3 +2,6 @@
 
 # Ignore node_modules directory
 node_modules/
+
+# Ignore VS Code extension packages
+*.vsix
